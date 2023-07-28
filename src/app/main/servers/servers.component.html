@@ -1,0 +1,199 @@
+<!-- <img class="max-w-36" src="assets/icons/centOS.png">
+<img class="max-w-36" src="assets/icons/ubuntu.png"> -->
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="bg-card">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+        <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12">
+            <div class="flex flex-auto items-center min-w-0">
+                <div class="flex flex-col min-w-0 ml-4">
+                        <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate"> Servers</div>
+                </div>
+            </div>
+            <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
+                <button
+                    class="bg-accent"
+                    mat-flat-button
+                    [color]="'accent'">
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2">ADD LINUX SERVER</span>
+                </button>
+                <button
+                    mat-flat-button
+                    [color]="'primary'">
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    <span class="ml-2">ADD WINDOWS SERVER</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="flex m-6 grid-cols-1 xl:grid-cols-3 gap-8 mt-8 ">
+    <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+        <!-- <div class="p-6">
+            <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Servers</div>
+        </div> -->
+        <div class="overflow-x-auto mx-6">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                <!-- IP ADDRESS COLUMN -->
+                <ng-container matColumnDef="ip_address">
+                  <th mat-header-cell *matHeaderCellDef>
+                    IP Address
+                  </th>
+                  <td mat-cell *matCellDef="let node">
+                    <a [routerLink]="[node?.id]">{{ node.ip_address }}</a>
+                  </td>
+                </ng-container>
+              
+                <!-- HOSTNAME COLUMN -->
+                <ng-container matColumnDef="hostname">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Hostname
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                      <a [routerLink]="[node?.id]">{{ node.server_info.operating_system.name.pretty }}</a>
+                    </td>
+                </ng-container>
+
+                <!-- OPERATING SYSTEM COLUMN -->
+                <ng-container matColumnDef="operating_system">
+                    <th mat-header-cell *matHeaderCellDef>
+                        OS
+                    </th>
+                    <td mat-cell *matCellDef="let node" >
+                        <img 
+                            [matTooltip]="node.server_info.operating_system.name.pretty"
+                            matTooltipPosition="above"
+                            [src]="os_img(node.server_info.operating_system.name.pretty)" 
+                        alt="">
+                      <!-- {{ node.operating_system }} -->
+                    </td>
+                </ng-container>
+
+                <!-- CPU USAGE COLUMN -->
+                <ng-container matColumnDef="cpu_usage">
+                    <th mat-header-cell *matHeaderCellDef>
+                        CPU 
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                        <mat-progress-spinner diameter="40"
+                            class="example-margin"
+                            color="primary"
+                            mode="determinate"
+                            [matTooltip]="node.server_info.cpu.usage.total.percent+'% Used'"
+                            matTooltipPosition="above"
+                            [value]="node.server_info.cpu.usage.total.percent">
+                        </mat-progress-spinner>
+                    </td>
+                </ng-container>
+
+                <!-- RAM USAGE COLUMN -->
+                <ng-container matColumnDef="ram_usage">
+                    <th mat-header-cell *matHeaderCellDef>
+                        RAM 
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                        <mat-progress-spinner diameter="40"
+                            class="example-margin"
+                            color="primary"
+                            mode="determinate"
+                            [matTooltip]="
+                                'Total: '+convertToGb(node.server_info.memory.virtual.total)+'GB '+
+                                'Used: '+convertToGb(node.server_info.memory.virtual.used)+'GB  '+
+                                'Free: '+convertToGb(node.server_info.memory.virtual.free)+'GB '"
+                            matTooltipPosition="above"
+                            [value]="node.server_info.memory.virtual.percent">
+                        </mat-progress-spinner>
+                    </td>
+                </ng-container>
+
+                <!-- DISK USAGE COLUMN -->
+                <ng-container matColumnDef="disk_usage">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Disk 
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                        <mat-progress-spinner diameter="40"
+                            class="example-margin"
+                            color="primary"
+                            mode="determinate"
+                            [matTooltip]="disk_usage_percent+'% Used'"
+                            matTooltipPosition="above"
+                            [value]="disk_usage_percent">
+                        </mat-progress-spinner>
+                    </td>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="cpu_count">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Load 
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                      {{ node.disk_usage }}%
+                    </td>
+                </ng-container> -->
+
+                <ng-container matColumnDef="net_stats">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Net(Kb/s)
+                    </th>
+                    <td mat-cell *matCellDef="let node">
+                      {{ convertToKb(node.net_packets_sent) }}
+                      <mat-icon svgIcon="heroicons_outline:arrow-long-up"></mat-icon><br>
+                      {{ convertToKb(node.net_packets_received) }}
+                      <mat-icon svgIcon="heroicons_outline:arrow-long-down"></mat-icon>
+                    </td>
+                </ng-container>
+
+
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Action
+                    </th>
+                    <td mat-cell *matCellDef="let node" class="whitespace-nowrap">
+                        <button 
+                            mat-button 
+                            color="primary"
+                            matTooltipPosition="above"
+                            matTooltip="View"
+                            [routerLink]="[node?.id]"
+                        >
+                            <mat-icon svgIcon="heroicons_solid:eye"></mat-icon>
+                        </button>
+                        <button 
+                            mat-button 
+                            color="accent" 
+                            matTooltipPosition="above"
+                            matTooltip="Edit"
+                        >
+                            <mat-icon svgIcon="heroicons_solid:pencil-square"></mat-icon>
+                        </button>
+                        <button 
+                            mat-button 
+                            color="warn" 
+                            matTooltipPosition="above"
+                            matTooltip="Delete"
+                        >
+                            <mat-icon svgIcon="mat_solid:delete"></mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                
+
+                <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayColumns;"></tr>
+            </table>
+
+            <mat-paginator class="sm:bottom-0 z-10"
+                [pageSize]="5"
+                [pageSizeOptions]="[5, 10, 25, 50, 100]"
+                [showFirstLastButtons]="true">
+            </mat-paginator>
+            
+        </div>
+    </div>
+</div>
